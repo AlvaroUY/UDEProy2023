@@ -3,24 +3,40 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class P2 : MonoBehaviour
+public class P2 : Photon.Pun.MonoBehaviourPun
 {
     public float speed = 5f ;
-    private Rigidbody rb ; 
+    internal Transform tr;
+    Rigidbody rg;
     private GameManager gm ;
 
-    private int player = 2; 
+    public int player; 
     public int bola; 
     public int costoVida = 100; 
 
+    public bool initialized = false;
+
     private void Awake() {
         gm = FindAnyObjectByType<GameManager>();
-        rb = GetComponent<Rigidbody>();
+    }
+
+    private void OnEnable()
+    {
+        if (!initialized){
+            Initialize();
+        }
+    }
+
+    void Initialize()
+    {
+        tr = this.transform;
+        rg = GetComponent<Rigidbody>();
+        initialized = true;
     }
 
     void Update()
     {
-        if (gm.getPlayer()==player && gm.getBola()==bola) {
+        if (player==gm.getPlayer() && photonView.IsMine && gm.getBola()==bola) {
             float movimientoHorizontal = Input.GetAxis("Horizontal");
             float movimientoVertical = Input.GetAxis("Vertical");            
             Vector3 desplazamiento = new Vector3(movimientoHorizontal, 0, movimientoVertical) * speed * Time.deltaTime;

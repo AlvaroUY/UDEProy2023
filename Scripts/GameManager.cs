@@ -10,10 +10,18 @@ using System.Text;
 using TMPro;
 using Unity.VisualScripting;
 
+using Photon.Pun;
+using Photon.Pun.UtilityScripts;
+
 public class GameManager : MonoBehaviour
 {
+
     private int player;
     private int bola;
+
+    public P1 P1_B1, P1_B2, P1_B3, P1_B4, P1_B5, P1_B6;
+    public P2 P2_B1, P2_B2, P2_B3, P2_B4, P2_B5, P2_B6, P2_B7;
+    public Transform P1_salida, P2_salida;
 
     public CanvasRenderer SelectPlayer, P1_BarraSuperior, P2_BarraSuperior, POPUP_Mensajes;
     public Slider P1_B1_SliderVida, P1_B2_SliderVida, P1_B3_SliderVida, P1_B4_SliderVida, P1_B5_SliderVida, P1_B6_SliderVida;
@@ -35,19 +43,13 @@ public class GameManager : MonoBehaviour
     private bool juegoTerminado = false;
     
     void Awake() {
-        P1_dinero = P2_dinero = 0;
+        player = PhotonNetwork.LocalPlayer.ActorNumber;
+        bola = 1;
+
+        POPUP_Mensajes.gameObject.SetActive(false);
+
         P1_B1_maxBalas = P1_B2_maxBalas = P1_B3_maxBalas = P1_B4_maxBalas = P1_B5_maxBalas = P1_B6_maxBalas = 4;
-        P1_B1_balas = P1_B2_balas = P1_B3_balas = P1_B4_balas = P1_B5_balas = P1_B6_balas = P1_B1_maxBalas ;
-
         P2_B1_maxBalas = 4;
-        P2_B2_maxCargadores = 5;
-        P2_B2_maxBalas = 4;
-        P2_B3_maxBalas = 1;
-        P2_B1_balas = P2_B1_maxBalas ;
-        P2_B2_balas = P2_B2_maxBalas ;
-        P2_B2_cargadores = P2_B2_maxCargadores ;
-        P2_B3_balas = P2_B3_maxBalas;
-
         P1_B1_maxVida = 2;
         P1_B2_maxVida = 2;
         P1_B3_maxVida = 2;
@@ -55,6 +57,9 @@ public class GameManager : MonoBehaviour
         P1_B5_maxVida = 2;
         P1_B6_maxVida = 2;
 
+        P2_B2_maxCargadores = 5;
+        P2_B2_maxBalas = 4;
+        P2_B3_maxBalas = 1;
         P2_B1_maxVida = 4; // bateria de misiles
         P2_B2_maxVida = 2; // bofors
         P2_B3_maxVida = 4; // cañon laser
@@ -63,24 +68,8 @@ public class GameManager : MonoBehaviour
         P2_B6_maxVida = 4; // central electrica
         P2_B7_maxVida = 1; // cable
 
-        P1_B1_vida = P1_B1_maxVida;
-        P1_B2_vida = P1_B2_maxVida;
-        P1_B3_vida = P1_B3_maxVida;
-        P1_B4_vida = P1_B4_maxVida;
-        P1_B5_vida = P1_B5_maxVida;
-        P1_B6_vida = P1_B6_maxVida;
-
-        P2_B1_vida = P2_B1_maxVida;
-        P2_B2_vida = P2_B2_maxVida;
-        P2_B3_vida = P2_B3_maxVida;
-        P2_B4_vida = P2_B4_maxVida;
-        P2_B5_vida = P2_B5_maxVida;
-        P2_B6_vida = P2_B6_maxVida;
-        P2_B7_vida = P2_B7_maxVida;
-
         P1_B1_SliderVida.minValue = P1_B2_SliderVida.minValue = P1_B3_SliderVida.minValue = P1_B4_SliderVida.minValue = P1_B5_SliderVida.minValue = P1_B6_SliderVida.minValue = 0;
         P2_B1_SliderVida.minValue = P2_B2_SliderVida.minValue = P2_B3_SliderVida.minValue = P2_B4_SliderVida.minValue = P2_B5_SliderVida.minValue = P2_B6_SliderVida.minValue = P2_B7_SliderVida.minValue = 0;
-        
         P1_B1_SliderVida.maxValue = P1_B1_maxVida;
         P1_B2_SliderVida.maxValue = P1_B2_maxVida;
         P1_B3_SliderVida.maxValue = P1_B3_maxVida;
@@ -109,9 +98,67 @@ public class GameManager : MonoBehaviour
         P2_B6_SliderVida.value = P2_B6_maxVida;
         P2_B7_SliderVida.value = P2_B7_maxVida;
 
-        P1_BarraSuperior.gameObject.SetActive(false);
-        P2_BarraSuperior.gameObject.SetActive(false);
-        POPUP_Mensajes.gameObject.SetActive(false);
+        if (player==1) {
+            Vector3 salida = new Vector3(P1_salida.position.x+UnityEngine.Random.Range(-20,0), P1_salida.position.y, P1_salida.position.z+UnityEngine.Random.Range(-20,20));
+            Photon.Pun.PhotonNetwork.Instantiate(P1_B1.name, salida - new Vector3(-10,0,-5), Quaternion.identity);
+            Photon.Pun.PhotonNetwork.Instantiate(P1_B2.name, salida - new Vector3(0,0,-5), Quaternion.identity);
+            Photon.Pun.PhotonNetwork.Instantiate(P1_B3.name, salida - new Vector3(10,0,-5), Quaternion.identity);
+            Photon.Pun.PhotonNetwork.Instantiate(P1_B4.name, salida - new Vector3(-10,0,5), Quaternion.identity);
+            Photon.Pun.PhotonNetwork.Instantiate(P1_B5.name, salida - new Vector3(0,0,5), Quaternion.identity);
+            Photon.Pun.PhotonNetwork.Instantiate(P1_B6.name, salida - new Vector3(10,0,5), Quaternion.identity);
+            P1_B1.player = P1_B2.player = P1_B3.player = P1_B4.player = P1_B5.player = P1_B6.player = player;
+            P1_B1.bola = 1;
+            P1_B2.bola = 2;
+            P1_B3.bola = 3;
+            P1_B4.bola = 4;
+            P1_B5.bola = 5;
+            P1_B6.bola = 6;
+            P1_BarraSuperior.gameObject.SetActive(true);
+            P2_BarraSuperior.gameObject.SetActive(false);
+        } else {
+            Vector3 salida = new Vector3(P2_salida.position.x+UnityEngine.Random.Range(0,20), P2_salida.position.y, P2_salida.position.z+UnityEngine.Random.Range(-5,5));
+            Photon.Pun.PhotonNetwork.Instantiate(P2_B1.name, salida - new Vector3(5,-3,10), Quaternion.identity);
+            Photon.Pun.PhotonNetwork.Instantiate(P2_B2.name, salida - new Vector3(0,-3,30), Quaternion.identity);
+            Photon.Pun.PhotonNetwork.Instantiate(P2_B3.name, salida - new Vector3(5,-3,-5), Quaternion.identity);
+            Photon.Pun.PhotonNetwork.Instantiate(P2_B4.name, salida - new Vector3(5,-3,-25), Quaternion.identity);
+            Photon.Pun.PhotonNetwork.Instantiate(P2_B5.name, salida - new Vector3(10,-3,20), Quaternion.identity);
+            Photon.Pun.PhotonNetwork.Instantiate(P2_B6.name, salida - new Vector3(0,-3,-20), Quaternion.identity);
+            Photon.Pun.PhotonNetwork.Instantiate(P2_B7.name, salida - new Vector3(-10,-8,-10), Quaternion.identity);
+            P2_B1.player = P2_B2.player = P2_B3.player = P2_B4.player = P2_B5.player = P2_B6.player = P2_B7.player = player;
+            P2_B1.bola = 1;
+            P2_B2.bola = 2;
+            P2_B3.bola = 3;
+            P2_B4.bola = 4;
+            P2_B5.bola = 5;
+            P2_B6.bola = 6;
+            P2_B7.bola = 7;
+            P1_BarraSuperior.gameObject.SetActive(false);
+            P2_BarraSuperior.gameObject.SetActive(true);
+        }
+
+        P1_dinero = P2_dinero = 0;
+        P1_B1_balas = P1_B2_balas = P1_B3_balas = P1_B4_balas = P1_B5_balas = P1_B6_balas = P1_B1_maxBalas ;
+
+        P2_B1_balas = P2_B1_maxBalas ;
+        P2_B2_balas = P2_B2_maxBalas ;
+        P2_B2_cargadores = P2_B2_maxCargadores ;
+        P2_B3_balas = P2_B3_maxBalas;
+
+        P1_B1_vida = P1_B1_maxVida;
+        P1_B2_vida = P1_B2_maxVida;
+        P1_B3_vida = P1_B3_maxVida;
+        P1_B4_vida = P1_B4_maxVida;
+        P1_B5_vida = P1_B5_maxVida;
+        P1_B6_vida = P1_B6_maxVida;
+
+        P2_B1_vida = P2_B1_maxVida;
+        P2_B2_vida = P2_B2_maxVida;
+        P2_B3_vida = P2_B3_maxVida;
+        P2_B4_vida = P2_B4_maxVida;
+        P2_B5_vida = P2_B5_maxVida;
+        P2_B6_vida = P2_B6_maxVida;
+        P2_B7_vida = P2_B7_maxVida;
+
     }
 
     void Update() {
@@ -124,13 +171,18 @@ public class GameManager : MonoBehaviour
         if (Input.GetKey(KeyCode.Alpha7) && getPlayer()==2) setBola(7);
         refreshUI();
        // refreshVida();
+
+        if (PhotonNetwork.CurrentRoom.PlayerCount < 2) {
+            mostrarMensaje("Cantidad insufiente de jugadores",5);
+            PhotonNetwork.Disconnect();
+        }
     }
 
     /*  --- UI --- */
 
-    public void mostrarMensaje (String txt) {
+    public void mostrarMensaje (String txt, int seg) {
         TXT_Mensajes.text = txt;
-        StartCoroutine(mostrarPopUp(2));
+        StartCoroutine(mostrarPopUp(seg));
     }
 
     IEnumerator mostrarPopUp(float delay) {
@@ -174,10 +226,10 @@ public class GameManager : MonoBehaviour
 
     private void buscarGanador() {
         if (getVida(1,1)==-1 && +getVida(1,2)==-1 && getVida(1,3)==-1 && getVida(1,4)==-1 && +getVida(1,5)==-1 && getVida(1,6)==-1) {
-            mostrarMensaje("GAME OVER!\nGanador: PLAYER 2");
+            mostrarMensaje("GAME OVER!\nGanador: PLAYER 2",5);
             juegoTerminado = true;
         } else if (getVida(2,1)==-1 && +getVida(2,2)==-1 && getVida(2,3)==-1 && getVida(2,4)==-1 && +getVida(2,5)==-1 && getVida(2,6)==-1) {
-            mostrarMensaje("GAME OVER!\nGanador: PLAYER 1");
+            mostrarMensaje("GAME OVER!\nGanador: PLAYER 1",5);
             juegoTerminado = true;
         }
     }

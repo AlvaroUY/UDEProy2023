@@ -14,6 +14,7 @@ public class CargaPartidas : MonoBehaviour
 
     void Awake() {
         controladorDatos = FindAnyObjectByType<ControladorDatos>();
+        /*
         controladorDatos.LoadExterno(Partida_1_id);
         DatosPartidas datosPartidas = controladorDatos.ListExterno();
         Partida_1_id = datosPartidas.Partida_1.id;
@@ -26,6 +27,7 @@ public class CargaPartidas : MonoBehaviour
         if (datosPartidas.Partida_3.id != -1) setTextoPartidas(3,Partida_3_id+": "+datosPartidas.Partida_3.fecha); else setTextoPartidas(3,"");
         if (datosPartidas.Partida_3.id != -1) setTextoPartidas(4,Partida_4_id+": "+datosPartidas.Partida_4.fecha); else setTextoPartidas(4,"");
         if (datosPartidas.Partida_5.id != -1) setTextoPartidas(5,Partida_5_id+": "+datosPartidas.Partida_5.fecha); else setTextoPartidas(5,"");
+        */
     }
 
     public void setTextoPartidas(int i, String txt) {

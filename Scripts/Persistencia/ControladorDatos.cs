@@ -6,29 +6,18 @@ using UnityEngine.Networking;
 
 public class ControladorDatos : MonoBehaviour
 {
+    private static String url = "http://localhost:8080/Drones";
     public DatosJuego datosJuego = new DatosJuego();
     public DatosPartidas datosPartidas = new DatosPartidas();
     private GameManager gm ;
+
     public GameObject P1_B1, P1_B2, P1_B3, P1_B4, P1_B5, P1_B6, P2_B1, P2_B2, P2_B3, P2_B4, P2_B5, P2_B6, P2_B7;
 
     void Awake() {
         gm = FindAnyObjectByType<GameManager>();
-        P1_B1 = GameObject.FindGameObjectWithTag("P1_B1");
-        P1_B2 = GameObject.FindGameObjectWithTag("P1_B2");
-        P1_B3 = GameObject.FindGameObjectWithTag("P1_B3");
-        P1_B4 = GameObject.FindGameObjectWithTag("P1_B4");
-        P1_B5 = GameObject.FindGameObjectWithTag("P1_B5");
-        P1_B6 = GameObject.FindGameObjectWithTag("P1_B6");
-        
-        P2_B1 = GameObject.FindGameObjectWithTag("P2_B1");
-        P2_B2 = GameObject.FindGameObjectWithTag("P2_B2");
-        P2_B3 = GameObject.FindGameObjectWithTag("P2_B3");
-        P2_B4 = GameObject.FindGameObjectWithTag("P2_B4");
-        P2_B5 = GameObject.FindGameObjectWithTag("P2_B5");
-        P2_B6 = GameObject.FindGameObjectWithTag("P2_B6");
-        P2_B6 = GameObject.FindGameObjectWithTag("P2_B7");
     }
 
+    
     void Update() {
         if (Input.GetKeyDown(KeyCode.L)) {
             StartCoroutine(List());
@@ -40,10 +29,11 @@ public class ControladorDatos : MonoBehaviour
             StartCoroutine(Save());
         }
     }
+    
 
-    public DatosPartidas ListExterno () {
+    public void ListExterno () {
         StartCoroutine(List());
-        return datosPartidas;
+        //return datosPartidas;
     }
 
     public void LoadExterno (int id) {
@@ -51,7 +41,7 @@ public class ControladorDatos : MonoBehaviour
     }
 
     public void SaveExterno () {
-        gm.mostrarMensaje("Partida guardada");
+        gm.mostrarMensaje("Partida guardada",2);
         StartCoroutine(Save());
     }
 
@@ -59,7 +49,7 @@ public class ControladorDatos : MonoBehaviour
 
         WWWForm formData = new WWWForm();
 
-        UnityWebRequest www = UnityWebRequest.Post("http://localhost:8080/Drones/List", formData);
+        UnityWebRequest www = UnityWebRequest.Post(url+"/List", formData);
         yield return www.SendWebRequest();
 
         if (www.result != UnityWebRequest.Result.Success)
@@ -73,6 +63,7 @@ public class ControladorDatos : MonoBehaviour
             Debug.Log("Partida_3: " + datosPartidas.Partida_3.id + " - " + datosPartidas.Partida_3.fecha);
             Debug.Log("Partida_4: " + datosPartidas.Partida_4.id + " - " + datosPartidas.Partida_4.fecha);
             Debug.Log("Partida_5: " + datosPartidas.Partida_5.id + " - " + datosPartidas.Partida_5.fecha);
+            //gm.cargarBotonesPartidas(datosPartidas);
         }
     }
 
@@ -81,7 +72,7 @@ public class ControladorDatos : MonoBehaviour
         WWWForm formData = new WWWForm();
         formData.AddField("id", id);
 
-        UnityWebRequest www = UnityWebRequest.Post("http://localhost:8080/Drones/Load", formData);
+        UnityWebRequest www = UnityWebRequest.Post(url+"/Load", formData);
         yield return www.SendWebRequest();
 
         if (www.result != UnityWebRequest.Result.Success)
@@ -105,6 +96,21 @@ public class ControladorDatos : MonoBehaviour
             Debug.Log("P2_B6 - Posicion: " + datosJuego.P2_B6_position + " - vida: " + datosJuego.P2_B6_vida);
             Debug.Log("P2_B7 - Posicion: " + datosJuego.P2_B7_position + " - vida: " + datosJuego.P2_B7_vida);
 
+            P1_B1 = GameObject.FindGameObjectWithTag("P1_B1");
+            P1_B2 = GameObject.FindGameObjectWithTag("P1_B2");
+            P1_B3 = GameObject.FindGameObjectWithTag("P1_B3");
+            P1_B4 = GameObject.FindGameObjectWithTag("P1_B4");
+            P1_B5 = GameObject.FindGameObjectWithTag("P1_B5");
+            P1_B6 = GameObject.FindGameObjectWithTag("P1_B6");
+            
+            P2_B1 = GameObject.FindGameObjectWithTag("P2_B1");
+            P2_B2 = GameObject.FindGameObjectWithTag("P2_B2");
+            P2_B3 = GameObject.FindGameObjectWithTag("P2_B3");
+            P2_B4 = GameObject.FindGameObjectWithTag("P2_B4");
+            P2_B5 = GameObject.FindGameObjectWithTag("P2_B5");
+            P2_B6 = GameObject.FindGameObjectWithTag("P2_B6");
+            P2_B6 = GameObject.FindGameObjectWithTag("P2_B7");
+            
             gm.setDinero(1,datosJuego.P1_dinero);
             P1_B1.transform.position = datosJuego.P1_B1_position;
             P1_B2.transform.position = datosJuego.P1_B2_position;
@@ -192,7 +198,7 @@ public class ControladorDatos : MonoBehaviour
         WWWForm formData = new WWWForm();
         formData.AddField("data", cadenaJSON);
 
-        UnityWebRequest www = UnityWebRequest.Post("http://localhost:8080/Drones/Save", formData);
+        UnityWebRequest www = UnityWebRequest.Post(url+"/Save", formData);
         yield return www.SendWebRequest();
 
         if (www.result != UnityWebRequest.Result.Success)
