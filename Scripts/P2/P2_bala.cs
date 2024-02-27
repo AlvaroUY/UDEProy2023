@@ -1,8 +1,12 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using Photon.Pun;
+using Unity.VisualScripting;
+using Photon.Realtime;
+using ExitGames.Client.Photon;
 
-public class P2_bala : MonoBehaviour
+public class P2_bala : MonoBehaviourPunCallbacks
 {
     private GameManager gm ;
 

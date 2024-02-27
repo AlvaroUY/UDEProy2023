@@ -1,14 +1,16 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-
-public class P2_disparar : MonoBehaviour
+using Photon.Pun;
+using Unity.VisualScripting;
+using System.Threading.Tasks;
+public class P2_disparar : MonoBehaviourPunCallbacks
 {
     private GameManager gm ;
     public GameObject bala;
     public Transform salidaBala;
 
-    private float fuerza = 1500;
+    private float fuerza = 30f;
     private float distancia = 0.5f;
 
     private float tiempo = 0;
@@ -26,12 +28,7 @@ public class P2_disparar : MonoBehaviour
             if (Input.GetKey(KeyCode.Space)) {
                 if (gm.getBalas(player,bola) > 0) {
                     if (Time.time > tiempo) {
-                        GameObject newBala;
-                        newBala = Instantiate(bala,salidaBala.position,salidaBala.rotation);
-                        newBala.GetComponent<Rigidbody>().AddForce(salidaBala.forward*fuerza);
-                        tiempo = Time.time + distancia;
-                        Destroy(newBala,1);
-                        gm.quitarBalas(player,bola);
+                        photonView.RPC("Disparar_RPCAsync", RpcTarget.AllBuffered, salidaBala.position, salidaBala.rotation);
                     }
                 }
             }
@@ -39,8 +36,27 @@ public class P2_disparar : MonoBehaviour
 
         if (gm.getPlayer()==player && gm.getBola()==2) {
             if (Input.GetKey(KeyCode.R)) {
-                gm.recargarBofors();
+                gm.recargarBofors(); 
             }
+        }
+    }
+
+
+    [PunRPC]
+    public async Task Disparar_RPCAsync(Vector3 position, Quaternion rotation)
+    {   
+        if (Time.time > tiempo) {
+            GameObject bala = BalasPool.bPool.GetBala();
+            Transform tr = bala.GetComponent<Transform>();
+            tr.position = position; 
+            tr.rotation = rotation; 
+            bala.SetActive(true);
+            Rigidbody rb = bala.GetComponent<Rigidbody>();
+            rb.velocity = tr.forward * fuerza;
+            tiempo = Time.time + distancia;
+            gm.quitarBalas(player,bola);
+            await Task.Delay(1500);
+            bala.SetActive(false);
         }
     }
 }

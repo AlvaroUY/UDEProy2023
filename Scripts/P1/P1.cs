@@ -2,6 +2,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using Photon.Pun;
 
 public class P1 : Photon.Pun.MonoBehaviourPun
 {
@@ -12,7 +13,7 @@ public class P1 : Photon.Pun.MonoBehaviourPun
 
     public int player; 
     public int bola; 
-    public int costoVida = 100; 
+    //public int costoVida = 100; 
 
     public bool initialized = false;
 
@@ -37,14 +38,22 @@ public class P1 : Photon.Pun.MonoBehaviourPun
     void Update()
     {
         if (player==gm.getPlayer() && photonView.IsMine && gm.getBola()==bola) {
+            /*
             float movimientoHorizontal = Input.GetAxis("Horizontal");
             float movimientoVertical = Input.GetAxis("Vertical");
-            float movimientoArriba = Input.GetAxis("Fire1");
-            float movimientoAbajo = Input.GetAxis("Fire2");
-            Vector3 desplazamiento = new Vector3(movimientoHorizontal, movimientoArriba - movimientoAbajo, movimientoVertical) * speed * Time.deltaTime;
+            //float movimientoArriba = Input.GetAxis("Fire1");
+            //float movimientoAbajo = Input.GetAxis("Fire2");
+            //Vector3 desplazamiento = new Vector3(movimientoHorizontal, movimientoArriba - movimientoAbajo, movimientoVertical) * speed * Time.deltaTime;
+            Vector3 desplazamiento = new Vector3(movimientoHorizontal, 0, movimientoVertical) * speed * Time.deltaTime;
             transform.Translate(desplazamiento);
+            */
+            var y = Input.GetAxis ("Horizontal") * Time.deltaTime * 150.0f;
+            var x = Input.GetAxis("Vertical") * Time.deltaTime * 30.0f;
+            transform.Rotate(0,y,0);
+            transform.Translate(x,0,0);
         }
 
+        /*
         if (gm.getPlayer()==player && gm.getBola()==bola) {
             if (Input.GetKey(KeyCode.M)) {
                 if (gm.getVida(player,bola)<gm.getMaxVida(player,bola) && gm.getDinero(player)>=costoVida) {
@@ -53,6 +62,7 @@ public class P1 : Photon.Pun.MonoBehaviourPun
                 }
             }
         }
+        */
     }
 
 }

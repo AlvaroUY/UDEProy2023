@@ -8,7 +8,7 @@ using UnityEngine.UI;
 
 public class AutoLobby : MonoBehaviourPunCallbacks
 {
-    public Button BTN_Nueva, BTN_Cargar;
+    public Button BTN_Nueva, BTN_Cargar, BTN_Partida1, BTN_Partida2, BTN_Partida3, BTN_Partida4, BTN_Partida5;
     public TMP_Text Log, PlayerCount;
     public int playersCount;
 
@@ -16,13 +16,16 @@ public class AutoLobby : MonoBehaviourPunCallbacks
     public byte minPlayersPerRoom = 2;
     private bool IsLoading = false;
 
+    private int partida;
+
     private GameManager gm ;
     private void Awake() {
         gm = FindAnyObjectByType<GameManager>();
     }
 
-    public void Connect()
+    public void Connect(int p)
     {
+        partida = p;
         if (!PhotonNetwork.IsConnected)
         {
             if (PhotonNetwork.ConnectUsingSettings())
@@ -45,8 +48,8 @@ public class AutoLobby : MonoBehaviourPunCallbacks
 
     public override void OnConnectedToMaster()
     {
-        BTN_Nueva.interactable = false;
-        BTN_Cargar.interactable = false;
+        BTN_Nueva.interactable = BTN_Cargar.interactable = false;
+        BTN_Partida1.interactable = BTN_Partida2.interactable = BTN_Partida3.interactable = BTN_Partida4.interactable = BTN_Partida5.interactable = false;
         JoinRandom();
     }
 
@@ -87,7 +90,8 @@ public class AutoLobby : MonoBehaviourPunCallbacks
     private void LoadMap()
     {
         IsLoading = true;
-        PhotonNetwork.LoadLevel("Juego");
+        //PhotonNetwork.LoadLevel("Juego");
+        gm.iniciarPartida(partida);
     }
 
 }
