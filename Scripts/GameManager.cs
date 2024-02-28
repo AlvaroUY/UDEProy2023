@@ -359,7 +359,7 @@ public class GameManager : MonoBehaviourPunCallbacks
             mostrarMensaje("GAME OVER!\nEmpate!",5);
             juegoTerminado = true;
         }
-        if (juegoTerminado) mostrarMenuInicial(true);
+        //if (juegoTerminado) mostrarMenuInicial(true);
     }
 
     public void refreshVida() {
