@@ -4,7 +4,7 @@ using UnityEngine;
 
 public class BalasPoolLaser : MonoBehaviour
 {
-       static public BalasPoolLaser lPool { get; private set; }
+    static public BalasPoolLaser lPool { get; private set; }
 
     public GameObject balaPrefab;
 
@@ -23,7 +23,6 @@ public class BalasPoolLaser : MonoBehaviour
             Balas.Add(bala);
             bala.SetActive(false);
         }
-        Debug.Log("cant de balas generadas: "+Balas.Count);
     }
 
 

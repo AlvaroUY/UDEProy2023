@@ -3,10 +3,11 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Networking;
+using Photon.Pun;
 
-public class ControladorDatos : MonoBehaviour
+public class ControladorDatos : MonoBehaviourPunCallbacks
 {
-    private static String url = "http://localhost:8080/Drones";
+    private static String url = "http://aaserver:8080/Drones";
     public DatosJuego datosJuego = new DatosJuego();
     public DatosPartidas datosPartidas = new DatosPartidas();
     private GameManager gm ;
@@ -18,14 +19,6 @@ public class ControladorDatos : MonoBehaviour
         gm = FindAnyObjectByType<GameManager>();
     }
 
-    /*
-    void Update() {
-        if (Input.GetKeyDown(KeyCode.L)) StartCoroutine(List());
-        //if (Input.GetKeyDown(KeyCode.C)) StartCoroutine(Load(357));
-        if (Input.GetKeyDown(KeyCode.G)) StartCoroutine(Save());
-    }
-    */
-
     public void ListExterno () {
         StartCoroutine(List());
     }
@@ -35,26 +28,28 @@ public class ControladorDatos : MonoBehaviour
     }
 
     public void SaveExterno () {
-        gm.mostrarMensaje("Partida guardada",2);
-        StartCoroutine(Save());
+        if (!gm.juegoTerminado) 
+            StartCoroutine(Save());
+        else
+            gm.mostrarMensaje("No es posible guardar una partida finalizada",2);
     }
 
     private void buscarGameObjects(int player) {
         if (player==1) {
-            P1_B1 = GameObject.FindGameObjectWithTag("P1_B1");
-            P1_B2 = GameObject.FindGameObjectWithTag("P1_B2");
-            P1_B3 = GameObject.FindGameObjectWithTag("P1_B3");
-            P1_B4 = GameObject.FindGameObjectWithTag("P1_B4");
-            P1_B5 = GameObject.FindGameObjectWithTag("P1_B5");
-            P1_B6 = GameObject.FindGameObjectWithTag("P1_B6");
+            if (gm.getVida(1,1)>0) P1_B1 = GameObject.FindGameObjectWithTag("P1_B1"); else P1_B1 = new GameObject();
+            if (gm.getVida(1,2)>0) P1_B2 = GameObject.FindGameObjectWithTag("P1_B2"); else P1_B2 = new GameObject();
+            if (gm.getVida(1,3)>0) P1_B3 = GameObject.FindGameObjectWithTag("P1_B3"); else P1_B3 = new GameObject();
+            if (gm.getVida(1,4)>0) P1_B4 = GameObject.FindGameObjectWithTag("P1_B4"); else P1_B4 = new GameObject();
+            if (gm.getVida(1,5)>0) P1_B5 = GameObject.FindGameObjectWithTag("P1_B5"); else P1_B5 = new GameObject();
+            if (gm.getVida(1,6)>0) P1_B6 = GameObject.FindGameObjectWithTag("P1_B6"); else P1_B6 = new GameObject();
         } else {
-            P2_B1 = GameObject.FindGameObjectWithTag("P2_B1");
-            P2_B2 = GameObject.FindGameObjectWithTag("P2_B2");
-            P2_B3 = GameObject.FindGameObjectWithTag("P2_B3");
-            P2_B4 = GameObject.FindGameObjectWithTag("P2_B4");
-            P2_B5 = GameObject.FindGameObjectWithTag("P2_B5");
-            P2_B6 = GameObject.FindGameObjectWithTag("P2_B6");
-            P2_B7 = GameObject.FindGameObjectWithTag("P2_B7");
+            if (gm.getVida(2,1)>0) P2_B1 = GameObject.FindGameObjectWithTag("P2_B1"); else P2_B1 = new GameObject();
+            if (gm.getVida(2,2)>0) P2_B2 = GameObject.FindGameObjectWithTag("P2_B2"); else P2_B2 = new GameObject();
+            if (gm.getVida(2,3)>0) P2_B3 = GameObject.FindGameObjectWithTag("P2_B3"); else P2_B3 = new GameObject();
+            if (gm.getVida(2,4)>0) P2_B4 = GameObject.FindGameObjectWithTag("P2_B4"); else P2_B4 = new GameObject();
+            if (gm.getVida(2,5)>0) P2_B5 = GameObject.FindGameObjectWithTag("P2_B5"); else P2_B5 = new GameObject();
+            if (gm.getVida(2,6)>0) P2_B6 = GameObject.FindGameObjectWithTag("P2_B6"); else P2_B6 = new GameObject();
+            if (gm.getVida(2,7)>0) P2_B7 = GameObject.FindGameObjectWithTag("P2_B7"); else P2_B7 = new GameObject();
         }
     }
 
@@ -66,17 +61,13 @@ public class ControladorDatos : MonoBehaviour
         yield return www.SendWebRequest();
 
         if (www.result != UnityWebRequest.Result.Success)
-            Debug.Log(www.error);
+            gm.mostrarMensaje("Error al obtener partidas",2);
         else {
-            Debug.Log("Envio OK!");
-            Debug.Log("Recibido: " + www.downloadHandler.text);
-            datosPartidas = JsonUtility.FromJson<DatosPartidas>(www.downloadHandler.text);
-            Debug.Log("Partida_1: " + datosPartidas.Partida_1.id + " - " + datosPartidas.Partida_1.fecha);
-            Debug.Log("Partida_2: " + datosPartidas.Partida_2.id + " - " + datosPartidas.Partida_2.fecha);
-            Debug.Log("Partida_3: " + datosPartidas.Partida_3.id + " - " + datosPartidas.Partida_3.fecha);
-            Debug.Log("Partida_4: " + datosPartidas.Partida_4.id + " - " + datosPartidas.Partida_4.fecha);
-            Debug.Log("Partida_5: " + datosPartidas.Partida_5.id + " - " + datosPartidas.Partida_5.fecha);
-            gm.cargarBotonesPartidas(datosPartidas);
+            if (www.downloadHandler.text != "ERROR") {
+                datosPartidas = JsonUtility.FromJson<DatosPartidas>(www.downloadHandler.text);
+                gm.cargarBotonesPartidas(datosPartidas);
+            } else
+                gm.mostrarMensaje("Error al obtener partidas",2);
         }
     }
 
@@ -89,38 +80,17 @@ public class ControladorDatos : MonoBehaviour
         yield return www.SendWebRequest();
 
         if (www.result != UnityWebRequest.Result.Success)
-            Debug.Log(www.error);
+            gm.mostrarMensaje("Error al cargar partida",2);
         else {
-            Debug.Log("Envio OK!");
             datosJuego = JsonUtility.FromJson<DatosJuego>(www.downloadHandler.text);
             if (player==1) {
-                Debug.Log("P1 - Dinero: " + datosJuego.P1_dinero);
-                Debug.Log("P1_B1 - Posicion: " + datosJuego.P1_B1_position + " - vida: " + datosJuego.P1_B1_vida + " - balas: " + datosJuego.P1_B1_balas);
-                Debug.Log("P1_B2 - Posicion: " + datosJuego.P1_B2_position + " - vida: " + datosJuego.P1_B2_vida + " - balas: " + datosJuego.P1_B2_balas);
-                Debug.Log("P1_B3 - Posicion: " + datosJuego.P1_B3_position + " - vida: " + datosJuego.P1_B3_vida + " - balas: " + datosJuego.P1_B3_balas);
-                Debug.Log("P1_B4 - Posicion: " + datosJuego.P1_B4_position + " - vida: " + datosJuego.P1_B4_vida + " - balas: " + datosJuego.P1_B4_balas);
-                Debug.Log("P1_B5 - Posicion: " + datosJuego.P1_B5_position + " - vida: " + datosJuego.P1_B5_vida + " - balas: " + datosJuego.P1_B5_balas);
-                Debug.Log("P1_B6 - Posicion: " + datosJuego.P1_B6_position + " - vida: " + datosJuego.P1_B6_vida + " - balas: " + datosJuego.P1_B6_balas);
-            } else {
-                Debug.Log("P2 - Dinero: " + datosJuego.P2_dinero);
-                Debug.Log("P2_B1 - Posicion: " + datosJuego.P2_B1_position + " - vida: " + datosJuego.P2_B1_vida + " - balas: " + datosJuego.P2_B1_balas);
-                Debug.Log("P2_B2 - Posicion: " + datosJuego.P2_B2_position + " - vida: " + datosJuego.P2_B2_vida + " - balas: " + datosJuego.P2_B2_balas + " - cargadores: " + datosJuego.P2_B2_cargadores);
-                Debug.Log("P2_B3 - Posicion: " + datosJuego.P2_B3_position + " - vida: " + datosJuego.P2_B3_vida);
-                Debug.Log("P2_B4 - Posicion: " + datosJuego.P2_B4_position + " - vida: " + datosJuego.P2_B4_vida);
-                Debug.Log("P2_B5 - Posicion: " + datosJuego.P2_B5_position + " - vida: " + datosJuego.P2_B5_vida);
-                Debug.Log("P2_B6 - Posicion: " + datosJuego.P2_B6_position + " - vida: " + datosJuego.P2_B6_vida);
-                Debug.Log("P2_B7 - Posicion: " + datosJuego.P2_B7_position + " - vida: " + datosJuego.P2_B7_vida);
-            }
-
-            if (player==1) {
-                buscarGameObjects(player);
                 gm.setDinero(1,datosJuego.P1_dinero);
-                P1_B1.transform.position = datosJuego.P1_B1_position;
-                P1_B2.transform.position = datosJuego.P1_B2_position;
-                P1_B3.transform.position = datosJuego.P1_B3_position;
-                P1_B4.transform.position = datosJuego.P1_B4_position;
-                P1_B5.transform.position = datosJuego.P1_B5_position;
-                P1_B6.transform.position = datosJuego.P1_B6_position;
+                gm.posicionarBola(1,1,datosJuego.P1_B1_position);
+                gm.posicionarBola(1,2,datosJuego.P1_B2_position);
+                gm.posicionarBola(1,3,datosJuego.P1_B3_position);
+                gm.posicionarBola(1,4,datosJuego.P1_B4_position);
+                gm.posicionarBola(1,5,datosJuego.P1_B5_position);
+                gm.posicionarBola(1,6,datosJuego.P1_B6_position);
                 gm.setVida(1,1,datosJuego.P1_B1_vida);
                 gm.setVida(1,2,datosJuego.P1_B2_vida);
                 gm.setVida(1,3,datosJuego.P1_B3_vida);
@@ -134,15 +104,14 @@ public class ControladorDatos : MonoBehaviour
                 gm.setBalas(1,5,datosJuego.P1_B5_balas);
                 gm.setBalas(1,6,datosJuego.P1_B6_balas);
             } else {
-                buscarGameObjects(player);
                 gm.setDinero(2,datosJuego.P2_dinero);
-                P2_B1.transform.position = datosJuego.P2_B1_position;
-                P2_B2.transform.position = datosJuego.P2_B2_position;
-                P2_B3.transform.position = datosJuego.P2_B3_position;
-                P2_B4.transform.position = datosJuego.P2_B4_position;
-                P2_B5.transform.position = datosJuego.P2_B5_position;
-                P2_B6.transform.position = datosJuego.P2_B6_position;
-                P2_B7.transform.position = datosJuego.P2_B7_position;
+                gm.posicionarBola(2,1,datosJuego.P2_B1_position);
+                gm.posicionarBola(2,2,datosJuego.P2_B2_position);
+                gm.posicionarBola(2,3,datosJuego.P2_B3_position);
+                gm.posicionarBola(2,4,datosJuego.P2_B4_position);
+                gm.posicionarBola(2,5,datosJuego.P2_B5_position);
+                gm.posicionarBola(2,6,datosJuego.P2_B6_position);
+                gm.posicionarBola(2,7,datosJuego.P2_B7_position);
                 gm.setVida(2,1,datosJuego.P2_B1_vida);
                 gm.setVida(2,2,datosJuego.P2_B2_vida);
                 gm.setVida(2,3,datosJuego.P2_B3_vida);
@@ -182,7 +151,7 @@ public class ControladorDatos : MonoBehaviour
             P1_B6_vida = gm.getVida(1,6),
             P1_B6_balas = gm.getBalas(1,6),
 
-            P2_dinero = gm.getDinero(1),
+            P2_dinero = gm.getDinero(2),
             P2_B1_position = P2_B1.transform.position,
             P2_B1_vida = gm.getVida(2,1),
             P2_B1_balas = gm.getBalas(2,1),
@@ -210,10 +179,12 @@ public class ControladorDatos : MonoBehaviour
         yield return www.SendWebRequest();
 
         if (www.result != UnityWebRequest.Result.Success)
-            Debug.Log(www.error);
+            gm.mostrarMensaje("Error al guardar partida",2);
         else {
-            Debug.Log("Envio OK!");
-            Debug.Log("Recibido: " + www.downloadHandler.text);
+            if (www.downloadHandler.text != "ERROR")
+                gm.mostrarMensaje("Partida guardada",2);
+            else
+                gm.mostrarMensaje("Error al guardar partida",2);
         }
     }
 

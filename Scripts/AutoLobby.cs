@@ -30,19 +30,12 @@ public class AutoLobby : MonoBehaviourPunCallbacks
         {
             if (PhotonNetwork.ConnectUsingSettings())
             {
-                Log.text += "\nConectado al servidor";
+                Log.text = "Conectado al servidor";
             }
             else
             {
-                Log.text += "\nError al conectar al servidor";
+                Log.text = "Error al conectar al servidor";
             }
-        }
-    }
-    public void JoinRandom()
-    {
-        if (!PhotonNetwork.JoinRandomRoom())
-        {
-            Log.text += "\nError al unirse a la sala";
         }
     }
 
@@ -53,9 +46,17 @@ public class AutoLobby : MonoBehaviourPunCallbacks
         JoinRandom();
     }
 
+    public void JoinRandom()
+    {
+        if (!PhotonNetwork.JoinRandomRoom())
+        {
+            Log.text += "\nError al unirse a la sala";
+        }
+    }
+
     public override void OnJoinRandomFailed(short returnCode, string message)
     {
-        Log.text += "\nNo existe sala a unirse, creando...";
+        Log.text += "\nNo existe sala a unirse";
 
         if (PhotonNetwork.CreateRoom(null, new Photon.Realtime.RoomOptions() { MaxPlayers = maxPlayersPerRoom }))
         {
@@ -69,7 +70,7 @@ public class AutoLobby : MonoBehaviourPunCallbacks
 
     public override void OnJoinedRoom()
     {
-        Log.text += "\nUnido";
+        Log.text += "\nUnido a la sala";
     }
 
 
@@ -80,17 +81,15 @@ public class AutoLobby : MonoBehaviourPunCallbacks
 
         PlayerCount.text = "Jugadores: " + playersCount + "/" + maxPlayersPerRoom;
 
-        if (!IsLoading && playersCount >= minPlayersPerRoom)
+        if (!IsLoading && playersCount == minPlayersPerRoom)
         {
             LoadMap();
         }
     }
 
-
     private void LoadMap()
     {
         IsLoading = true;
-        //PhotonNetwork.LoadLevel("Juego");
         gm.iniciarPartida(partida);
     }
 

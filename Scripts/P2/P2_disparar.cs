@@ -25,7 +25,7 @@ public class P2_disparar : MonoBehaviourPunCallbacks
     void Update()
     {
         if (gm.getPlayer()==player && gm.getBola()==bola) {
-            if (Input.GetKey(KeyCode.Space)) {
+            if (Input.GetKeyDown(KeyCode.Space)) {
                 if (gm.getBalas(player,bola) > 0) {
                     if (Time.time > tiempo) {
                         photonView.RPC("Disparar_RPCAsync", RpcTarget.AllBuffered, salidaBala.position, salidaBala.rotation);
@@ -35,15 +35,19 @@ public class P2_disparar : MonoBehaviourPunCallbacks
         }
 
         if (gm.getPlayer()==player && gm.getBola()==2) {
-            if (Input.GetKey(KeyCode.R)) {
-                gm.recargarBofors(); 
+            if (Input.GetKeyDown(KeyCode.R)) {
+                photonView.RPC("localRecargarBofors", RpcTarget.AllBuffered);
             }
         }
     }
 
+    [PunRPC]
+    public void localRecargarBofors() {
+        gm.recargarBofors();
+    }
 
     [PunRPC]
-    public async Task Disparar_RPCAsync(Vector3 position, Quaternion rotation)
+    public IEnumerator Disparar_RPCAsync(Vector3 position, Quaternion rotation)
     {   
         if (Time.time > tiempo) {
             GameObject bala = BalasPool.bPool.GetBala();
@@ -55,8 +59,9 @@ public class P2_disparar : MonoBehaviourPunCallbacks
             rb.velocity = tr.forward * fuerza;
             tiempo = Time.time + distancia;
             gm.quitarBalas(player,bola);
-            await Task.Delay(1500);
-            bala.SetActive(false);
+            yield return new WaitForSeconds(3);
+            bala.gameObject.SetActive(false);
         }
     }
+
 }

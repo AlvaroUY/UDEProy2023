@@ -23,7 +23,6 @@ public class BalasPool : MonoBehaviour
             Balas.Add(bala);
             bala.SetActive(false);
         }
-        Debug.Log("cant de balas generadas: "+Balas.Count);
     }
 
 

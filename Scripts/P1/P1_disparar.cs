@@ -26,7 +26,7 @@ public class P1_disparar : MonoBehaviourPunCallbacks
     void Update()
     {
         if (gm.getPlayer()==player && gm.getBola()==bola) {
-            if (Input.GetKey(KeyCode.Space)) {
+            if (Input.GetKeyDown(KeyCode.Space)) {
                 if (gm.getBalas(player,bola) > 0) {
                     if (Time.time > tiempo) {
                         photonView.RPC("Disparar_RPCAsync", RpcTarget.AllBuffered, salidaBala.position, salidaBala.rotation);
@@ -38,28 +38,21 @@ public class P1_disparar : MonoBehaviourPunCallbacks
 
 
     [PunRPC]
-    public async Task Disparar_RPCAsync(Vector3 position, Quaternion rotation)
-    {   
-        //Debug.Log("entré al disparar_RPC");
+    public IEnumerator Disparar_RPCAsync(Vector3 position, Quaternion rotation)
+    {
         if (Time.time > tiempo) {
             GameObject bala = BalasPool.bPool.GetBala();
-           // if(bala != null)
-             //   Debug.Log("obtuve bala");
             Transform tr = bala.GetComponent<Transform>();
-            //if(tr != null)
-              //  Debug.Log("obtuve el transform");
+            gm.quitarBalas(player,bola);
+            bala.SetActive(true);
             tr.position = position; 
             tr.rotation = rotation; 
-            bala.SetActive(true);
             Rigidbody rb = bala.GetComponent<Rigidbody>();
-            //if(rb != null)
-              //  Debug.Log("obtuve el Rigidbody");
             rb.velocity = tr.forward * fuerza;
             tiempo = Time.time + distancia;
-           // bala.SetActive(false);
-            gm.quitarBalas(player,bola);
-            await Task.Delay(1500);
-            bala.SetActive(false);
+            yield return new WaitForSeconds(3);
+            bala.gameObject.SetActive(false);
         }
     }
+
 }
