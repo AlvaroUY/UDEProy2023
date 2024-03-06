@@ -8,7 +8,7 @@ public class CamaraAerea : MonoBehaviour
 
     private GameManager gm ;
 
-    private int alturaInicial=175, altura, alturaFinal=75;
+    private int alturaInicial=200, altura, alturaFinal=150;
     private bool iniciado = false;
 
     private void Awake() {
@@ -22,7 +22,7 @@ public class CamaraAerea : MonoBehaviour
             player = unidad.transform;
             iniciado = true;
             if (iniciado) {
-                transform.position = player.transform.position + new Vector3(0,altura,-10);
+                transform.position = player.transform.position + new Vector3(0,altura,-30);
                 if (altura>alturaFinal) altura--;
             }
         } catch {
@@ -33,7 +33,7 @@ public class CamaraAerea : MonoBehaviour
                 gm.setBola(i);
                 GameObject unidad = GameObject.FindGameObjectWithTag("P"+gm.getPlayer()+"_B"+i);
                 player = unidad.transform;
-                transform.position = player.transform.position + new Vector3(0,altura,-10);
+                transform.position = player.transform.position + new Vector3(0,altura,-30);
             } 
         }
     }

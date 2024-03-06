@@ -339,27 +339,7 @@ public class GameManager : MonoBehaviourPunCallbacks
     }
 
     private void buscarGanador() {
-        if  (
-                (
-                    (getVida(1,1)==-1 || (getVida(1,1)>0 && getBalas(1,1)==0)) && 
-                    (getVida(1,2)==-1 || (getVida(1,2)>0 && getBalas(1,2)==0)) && 
-                    (getVida(1,3)==-1 || (getVida(1,3)>0 && getBalas(1,3)==0)) && 
-                    (getVida(1,4)==-1 || (getVida(1,4)>0 && getBalas(1,4)==0)) && 
-                    (getVida(1,5)==-1 || (getVida(1,5)>0 && getBalas(1,5)==0)) && 
-                    (getVida(1,6)==-1 || (getVida(1,6)>0 && getBalas(1,6)==0)) && 
-                    getDinero(1)==0
-                ) && (
-                    (
-                        (getVida(2,1)==-1 || (getVida(2,1)>0 && getBalas(2,1)==0 && getDinero(2)==0)) &&
-                        (getVida(2,2)==-1 || (getVida(2,2)>0 && getBalas(2,2)==0 && getCargadores()==0 && getDinero(2)<100)) //&&
-                        //(getVida(2,3)==-1 || (getVida(2,6)==-1 || getVida(2,7)==-1))
-                    )
-                )
-            )
-        {
-            mostrarMensaje("PARTIDA FINALIZADA\nEmpate",3000);
-            juegoTerminado = true;
-        } else if (
+        if (
             (getVida(1,1)==-1 && getVida(1,2)==-1 && getVida(1,3)==-1 && getVida(1,4)==-1 && getVida(1,5)==-1 && getVida(1,6)==-1) ||
             (
                 (getVida(1,1)==-1 || (getVida(1,1)>0 && getBalas(1,1)==0)) && 
